@@ -1,0 +1,586 @@
+Schema::create('categories', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('parent_id')
+        ->nullable()
+        ->constrained('categories')
+        ->nullOnDelete();
+
+    $table->string('name');
+    $table->string('slug')->unique();
+    $table->string('icon')->nullable();
+
+    $table->boolean('status')->default(true);
+
+    $table->timestamps();
+});
+
+
+Schema::create('brands', function (Blueprint $table) {
+    $table->id();
+
+    $table->string('name');
+    $table->string('slug')->unique();
+    $table->string('logo')->nullable();
+    $table->string('country')->nullable();
+
+    $table->boolean('status')->default(true);
+
+    $table->timestamps();
+});
+
+Schema::create('leagues', function (Blueprint $table) {
+    $table->id();
+
+    $table->string('name');
+    $table->string('slug')->unique();
+    $table->string('logo')->nullable();
+
+    $table->boolean('status')->default(true);
+
+    $table->timestamps();
+});
+
+Schema::create('clubs', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('league_id')
+        ->nullable()
+        ->constrained()
+        ->nullOnDelete();
+
+    $table->string('name');
+    $table->string('slug')->unique();
+
+    $table->string('logo')->nullable();
+
+    $table->string('country')->nullable();
+
+    $table->boolean('status')->default(true);
+
+    $table->timestamps();
+});
+
+
+Schema::create('sizes', function (Blueprint $table) {
+    $table->id();
+
+    $table->string('name');
+
+    $table->integer('sort_order')->default(0);
+
+    $table->boolean('status')->default(true);
+
+    $table->timestamps();
+});
+
+
+Schema::create('tags', function (Blueprint $table) {
+    $table->id();
+
+    $table->string('name');
+    $table->string('slug')->unique();
+
+    $table->timestamps();
+});
+
+
+Schema::create('products', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+
+    $table->foreignId('brand_id')
+        ->nullable()
+        ->constrained()
+        ->nullOnDelete();
+
+    $table->foreignId('club_id')
+        ->nullable()
+        ->constrained()
+        ->nullOnDelete();
+
+    $table->string('name');
+
+    $table->string('slug')->unique();
+
+    $table->string('sku')->unique();
+
+    $table->text('short_description')->nullable();
+
+    $table->longText('description')->nullable();
+
+    $table->string('season')->nullable();
+
+    $table->enum('gender',[
+        'Men',
+        'Women',
+        'Kids',
+        'Unisex'
+    ])->default('Unisex');
+
+    $table->boolean('allow_custom_name')->default(false);
+
+    $table->boolean('allow_custom_number')->default(false);
+
+    $table->boolean('featured')->default(false);
+
+    $table->boolean('best_seller')->default(false);
+
+    $table->boolean('new_arrival')->default(false);
+
+    $table->boolean('status')->default(true);
+
+    $table->timestamps();
+});
+
+
+Schema::create('product_images', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('product_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->string('image');
+
+    $table->integer('sort_order')->default(0);
+
+    $table->timestamps();
+});
+
+
+Schema::create('product_variants', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('product_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->string('name');
+
+    $table->string('sku')->unique();
+
+    $table->decimal('price',10,2);
+
+    $table->decimal('sale_price',10,2)->nullable();
+
+    $table->decimal('cost_price',10,2)->nullable();
+
+    $table->decimal('weight',8,2)->nullable();
+
+    $table->boolean('status')->default(true);
+
+    $table->timestamps();
+});
+
+
+Schema::create('variant_images', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('variant_id')
+        ->constrained('product_variants')
+        ->cascadeOnDelete();
+
+    $table->string('image');
+
+    $table->integer('sort_order')->default(0);
+
+    $table->timestamps();
+});
+
+
+Schema::create('inventories', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('variant_id')
+        ->constrained('product_variants')
+        ->cascadeOnDelete();
+
+    $table->foreignId('size_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->string('sku')->unique();
+
+    $table->integer('stock')->default(0);
+
+    $table->timestamps();
+
+    $table->unique([
+        'variant_id',
+        'size_id'
+    ]);
+});
+
+
+Schema::create('product_tag', function (Blueprint $table) {
+
+    $table->foreignId('product_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->foreignId('tag_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->primary([
+        'product_id',
+        'tag_id'
+    ]);
+});
+
+
+Schema::create('banners', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->string('title');
+
+    $table->string('subtitle')->nullable();
+
+    $table->string('image');
+
+    $table->string('mobile_image')->nullable();
+
+    $table->string('button_text')->nullable();
+
+    $table->string('button_link')->nullable();
+
+    $table->integer('sort_order')->default(0);
+
+    $table->boolean('status')->default(true);
+
+    $table->timestamps();
+});
+
+
+Schema::create('wishlists', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('user_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->foreignId('product_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->timestamps();
+
+    $table->unique([
+        'user_id',
+        'product_id'
+    ]);
+});
+
+
+Schema::create('reviews', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('user_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->foreignId('product_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->tinyInteger('rating');
+
+    $table->text('review')->nullable();
+
+    $table->boolean('status')->default(false);
+
+    $table->timestamps();
+});
+
+
+Schema::create('carts', function (Blueprint $table) {
+    $table->id();
+
+    $table->foreignId('user_id')
+        ->nullable()
+        ->constrained()
+        ->nullOnDelete();
+
+    $table->uuid('token')->unique();
+
+    $table->decimal('subtotal', 10, 2)->default(0);
+    $table->decimal('discount', 10, 2)->default(0);
+    $table->decimal('shipping_charge', 10, 2)->default(0);
+    $table->decimal('total', 10, 2)->default(0);
+
+    $table->timestamps();
+});
+
+
+Schema::create('cart_items', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('cart_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->foreignId('variant_id')
+        ->constrained('product_variants')
+        ->cascadeOnDelete();
+
+    $table->foreignId('size_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->unsignedInteger('quantity')->default(1);
+
+    $table->decimal('price', 10, 2);
+
+    $table->decimal('total', 10, 2);
+
+    // Custom Jersey
+    $table->string('player_name')->nullable();
+    $table->string('player_number')->nullable();
+
+    $table->boolean('league_patch')->default(false);
+    $table->boolean('champions_patch')->default(false);
+
+    $table->timestamps();
+});
+
+
+Schema::create('addresses', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('user_id')
+        ->nullable()
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->string('name');
+
+    $table->string('phone');
+
+    $table->string('email')->nullable();
+
+    $table->string('country')->default('Bangladesh');
+
+    $table->string('division');
+
+    $table->string('district');
+
+    $table->string('upazila')->nullable();
+
+    $table->string('area')->nullable();
+
+    $table->text('address');
+
+    $table->string('postcode')->nullable();
+
+    $table->boolean('is_default')->default(false);
+
+    $table->timestamps();
+});
+
+
+Schema::create('coupons', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->string('name');
+
+    $table->string('code')->unique();
+
+    $table->enum('type', [
+        'fixed',
+        'percent'
+    ]);
+
+    $table->decimal('value', 10, 2);
+
+    $table->decimal('minimum_amount', 10, 2)->nullable();
+
+    $table->decimal('maximum_discount', 10, 2)->nullable();
+
+    $table->unsignedInteger('usage_limit')->nullable();
+
+    $table->unsignedInteger('used')->default(0);
+
+    $table->timestamp('starts_at')->nullable();
+
+    $table->timestamp('expires_at')->nullable();
+
+    $table->boolean('status')->default(true);
+
+    $table->timestamps();
+});
+
+
+Schema::create('orders', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->string('order_number')->unique();
+
+    $table->foreignId('user_id')
+        ->nullable()
+        ->constrained()
+        ->nullOnDelete();
+
+    $table->foreignId('address_id')
+        ->nullable()
+        ->constrained()
+        ->nullOnDelete();
+
+    $table->foreignId('coupon_id')
+        ->nullable()
+        ->constrained()
+        ->nullOnDelete();
+
+    $table->decimal('subtotal', 10, 2);
+
+    $table->decimal('discount', 10, 2)->default(0);
+
+    $table->decimal('shipping_charge', 10, 2)->default(0);
+
+    $table->decimal('total', 10, 2);
+
+    $table->enum('payment_method', [
+        'cash_on_delivery',
+        'bkash',
+        'nagad',
+        'rocket',
+        'sslcommerz',
+        'stripe'
+    ]);
+
+    $table->enum('payment_status', [
+        'pending',
+        'paid',
+        'failed',
+        'refunded'
+    ])->default('pending');
+
+    $table->enum('order_status', [
+        'pending',
+        'confirmed',
+        'processing',
+        'shipped',
+        'delivered',
+        'cancelled'
+    ])->default('pending');
+
+    $table->text('notes')->nullable();
+
+    $table->timestamps();
+});
+
+
+Schema::create('order_items', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->foreignId('order_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->foreignId('product_id')
+        ->constrained()
+        ->cascadeOnDelete();
+
+    $table->foreignId('variant_id')
+        ->nullable()
+        ->constrained('product_variants')
+        ->nullOnDelete();
+
+    $table->foreignId('size_id')
+        ->nullable()
+        ->constrained()
+        ->nullOnDelete();
+
+    $table->string('product_name');
+
+    $table->string('variant_name')->nullable();
+
+    $table->string('size')->nullable();
+
+    $table->unsignedInteger('quantity');
+
+    $table->decimal('price', 10, 2);
+
+    $table->decimal('total', 10, 2);
+
+    $table->string('player_name')->nullable();
+
+    $table->string('player_number')->nullable();
+
+    $table->boolean('league_patch')->default(false);
+
+    $table->boolean('champions_patch')->default(false);
+
+    $table->timestamps();
+});
+
+Schema::create('settings', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->string('site_name');
+
+    $table->string('site_title')->nullable();
+
+    $table->string('logo')->nullable();
+
+    $table->string('favicon')->nullable();
+
+    $table->string('email')->nullable();
+
+    $table->string('phone')->nullable();
+
+    $table->string('whatsapp')->nullable();
+
+    $table->text('address')->nullable();
+
+    $table->string('facebook')->nullable();
+
+    $table->string('instagram')->nullable();
+
+    $table->string('youtube')->nullable();
+
+    $table->string('tiktok')->nullable();
+
+    $table->string('twitter')->nullable();
+
+    $table->text('footer_text')->nullable();
+
+    $table->timestamps();
+});
+
+
+Schema::create('pages', function (Blueprint $table) {
+
+    $table->id();
+
+    $table->string('title');
+
+    $table->string('slug')->unique();
+
+    $table->longText('content')->nullable();
+
+    $table->string('meta_title')->nullable();
+
+    $table->text('meta_description')->nullable();
+
+    $table->string('meta_keywords')->nullable();
+
+    $table->boolean('status')->default(true);
+
+    $table->timestamps();
+});
