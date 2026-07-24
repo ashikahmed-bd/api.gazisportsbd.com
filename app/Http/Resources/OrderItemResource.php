@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BannerResource extends JsonResource
+class OrderItemResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,15 +18,16 @@ class BannerResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'order' => $this->whenLoaded('order'),
+            'product' => $this->whenLoaded('product'),
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'cover_url' => $this->cover_url,
+            'options' => $this->options ?? [],
 
-            'title' => $this->title,
-            'subtitle' => $this->subtitle,
-            'description' => $this->description,
-            'image_url' => $this->image_url,
-            'sort_order' => $this->sort_order,
-            'starts_at' => $this->starts_at,
-            'ends_at' => $this->ends_at,
-            'active' => (bool) $this->active,
+            'price' => $this->price,
+            'quantity' => (int) $this->quantity,
+            'total' => number_format($this->price * $this->quantity, 2, '.', ''),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

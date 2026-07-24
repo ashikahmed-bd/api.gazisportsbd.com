@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('country')->nullable();
 
             $table->integer('sort_order')->default(0);
-            $table->boolean('status')->default(true);
+            $table->boolean('active')->default(true);
 
             $table->string('meta_title')->nullable();
             $table->string('meta_keywords')->nullable();

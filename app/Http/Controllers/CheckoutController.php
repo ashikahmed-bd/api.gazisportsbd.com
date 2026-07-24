@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Enums\OrderStatus;
-use App\enums\PaymentMethod;
-use App\Enums\PaymentStatus;
+use App\Enums\PaymentMethod;
 use App\Models\Cart;
 use App\Models\Order;
+use App\Notifications\NewOrderNotification;
+use App\Notifications\OrderConfirmedNotification;
 use App\Services\CodService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckoutController extends Controller
@@ -73,6 +76,15 @@ class CheckoutController extends Controller
         }
 
         $cart->delete();
+
+        if (config('app.sms.enabled')) {
+
+            Notification::route('sms', config('app.support.phone'))
+                ->notify(new NewOrderNotification($order));
+
+            Notification::route('sms', $order->phone)
+                ->notify(new OrderConfirmedNotification($order));
+        }
 
         $method = strtolower($request->payment_method);
 

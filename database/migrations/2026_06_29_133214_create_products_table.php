@@ -14,27 +14,21 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('brand_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('club_id')->nullable()->constrained()->nullOnDelete();
-
             $table->string('name');
             $table->string('slug')->unique();
 
             $table->text('highlights')->nullable();
             $table->longText('description')->nullable();
-            $table->json('options')->nullable();
+            $table->text('options')->nullable();
 
             $table->decimal('base_price', 10, 2);
             $table->decimal('price', 10, 2);
             $table->integer('stock')->default(0);
 
-            $table->enum('gender', ['Men', 'Women', 'Kids', 'Unisex'])->default('Unisex');
+            $table->enum('gender', ['men', 'women', 'kids', 'unisex'])->default('unisex');
 
             $table->string('cover')->nullable();
-            $table->json('gallery')->nullable();
-
-            $table->decimal('weight', 8, 2)->nullable();
+            $table->text('gallery')->nullable();
 
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
@@ -44,6 +38,11 @@ return new class extends Migration
             $table->boolean('featured')->default(false);
 
             $table->boolean('active')->default(true);
+
+            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('brand_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('club_id')->nullable()->constrained()->nullOnDelete();
+
             $table->timestamps();
         });
     }

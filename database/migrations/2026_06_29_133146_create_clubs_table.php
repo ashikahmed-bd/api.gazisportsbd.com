@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('clubs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('league_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('league_id')->nullable()->constrained('leagues')->nullOnDelete();
 
             $table->string('name');
             $table->string('slug')->unique();
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('stadium')->nullable();
 
             $table->integer('sort_order')->default(0);
-            $table->boolean('status')->default(true);
+            $table->boolean('active')->default(true);
 
             $table->string('meta_title')->nullable();
             $table->string('meta_keywords')->nullable();

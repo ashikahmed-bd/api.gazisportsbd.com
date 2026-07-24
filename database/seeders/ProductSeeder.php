@@ -118,13 +118,13 @@ class ProductSeeder extends Seeder
                 ',
 
                 'options' => [
-                    'Color' => ['Black', 'White', 'Blue'],
-                    'Size' => ['S', 'M', 'L', 'XL', 'XXL']
+                    'color' => ['Black', 'White', 'Blue'],
+                    'size' => ['S', 'M', 'L', 'XL', 'XXL']
                 ],
 
                 'stock' => rand(20, 150),
 
-                'gender' => 'Unisex',
+                'gender' => 'unisex',
                 'cover' => null,
                 'gallery' => [
                     'products/default.jpg',

@@ -14,12 +14,12 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::query()->create([
-            'name' => 'Abu Toha',
-            'phone' => '01911588858',
+            'name' => 'Omar Faruk',
+            'phone' => '01955213569',
             'phone_verified_at' => now(),
-            'email' => 'store@buyzin.com',
+            'email' => 'info@gazisportsbd.com',
             'email_verified_at' => now(),
-            'password' => bcrypt('password'),
+            'password' => bcrypt('Omarfarukomi1!'),
             'role' => 'admin',
             'photo' => '',
             'disabled' => false,

@@ -2,113 +2,113 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\BrandRequest;
-use App\Http\Resources\BrandResource;
-use App\Models\Brand;
+use App\Http\Requests\LeagueRequest;
+use App\Http\Resources\LeagueResource;
+use App\Models\League;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
 use Symfony\Component\HttpFoundation\Response;
 
-class BrandController extends Controller
+class LeagueController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $brands = Brand::query()
+        $leagues = League::query()
             ->when($request->search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })
             ->latest()
             ->paginate($request->limit ?? 10);
 
-        return BrandResource::collection($brands);
+        return LeagueResource::collection($leagues);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(BrandRequest $request)
+    public function store(LeagueRequest $request)
     {
-        $brand = Brand::create([
+        $league = League::create([
             'name' => $request->name,
             'slug' => Str::slug($request->slug),
-            'logo' => $request->logo,
             'country' => $request->country,
             'meta_title' => $request->meta_title,
-            'meta_keywords' => $request->meta_keywords,
             'meta_description' => $request->meta_description,
-            'active' => $request->boolean('active'),
+            'meta_keywords' => $request->meta_keywords,
+            'sort_order'  => League::max('sort_order') + 1,
+            'active' => (bool) $request->active,
         ]);
 
-        return (new BrandResource($brand))->additional([
-            'message' => 'Brand created successfully.'
-        ]);
+        return (new LeagueResource($league->fresh()))
+            ->additional([
+                'message' => 'League created successfully.'
+            ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Brand $brand)
+    public function show(League $league)
     {
-        return new BrandResource($brand);
+        return LeagueResource::make($league);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(BrandRequest $request, Brand $brand)
+    public function update(LeagueRequest $request, League $league)
     {
-        $brand->update([
+        $league->update([
             'name' => $request->name,
             'slug' => Str::slug($request->slug),
-            'logo' => $request->logo,
             'country' => $request->country,
             'meta_title' => $request->meta_title,
-            'meta_keywords' => $request->meta_keywords,
             'meta_description' => $request->meta_description,
-            'active' => $request->boolean('active'),
+            'meta_keywords' => $request->meta_keywords,
+            'active' => (bool) $request->active,
         ]);
 
-        return (new BrandResource($brand->fresh()))
+        return (new LeagueResource($league->fresh()))
             ->additional([
-                'message' => 'Brand updated successfully.'
+                'message' => 'League updated successfully.'
             ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Brand $brand)
+    public function destroy(League $league)
     {
-        $brand->delete($brand->id);
+        $league->delete($league->id);
 
         return response()->json([
             'success' => true,
-            'message' => 'Brand deleted successfully.'
+            'message' => 'League deleted successfully.'
         ]);
     }
 
-    public function logo(Request $request, Brand $brand)
+    public function logo(Request $request, League $league)
     {
         $request->validate([
             'logo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
-        if ($brand->logo && Storage::disk(config('app.disk'))->exists($brand->logo)) {
-            Storage::disk(config('app.disk'))->delete($brand->logo);
+        if ($league->logo && Storage::disk(config('app.disk'))->exists($league->logo)) {
+            Storage::disk(config('app.disk'))->delete($league->logo);
         }
 
-        $path = $request->file('logo')->store('brands', config('app.disk'));
+        $path = $request->file('logo')->store('leagues', config('app.disk'));
 
         Image::decode($request->file('logo'))
             ->cover(200, 200)
             ->save(Storage::disk(config('app.disk'))->path($path));
 
-        $brand->update([
+        $league->update([
             'logo' => $path,
         ]);
 
@@ -120,7 +120,7 @@ class BrandController extends Controller
 
     public function search(Request $request)
     {
-        return Brand::query()
+        return League::query()
             ->select('id', 'name')
             ->when($request->filled('q'), function ($query) use ($request) {
                 $query->where('name', 'like', '%' . $request->q . '%');

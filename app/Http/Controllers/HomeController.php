@@ -64,14 +64,14 @@ class HomeController extends Controller
             ->get();
 
         $leagues = League::query()
-            ->where('status', true)
+            ->where('active', true)
             ->withCount('clubs')
             ->orderBy('sort_order')
             ->get();
 
 
         $clubs = Club::query()
-            ->where('status', true)
+            ->where('active', true)
             ->orderBy('sort_order', 'asc')
             ->take(20)
             ->get();

@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             ClubSeeder::class,
             BannerSeeder::class,
             ProductSeeder::class,
+            CouponSeeder::class,
         ]);
     }
 }

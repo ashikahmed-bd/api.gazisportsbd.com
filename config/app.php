@@ -2,6 +2,42 @@
 
 return [
 
+    'disk' => 'public',
+
+    'support' => [
+        'phone' => env('SUPPORT_PHONE'),
+        'whatsapp' => env('SUPPORT_WHATSAPP'),
+        'email' => env('SUPPORT_EMAIL'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | SMS Gateway Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the SMS gateway service used to send text messages
+    | such as OTPs and notifications.
+    |
+    | Supported Keys:
+    | - base_url:  The root API endpoint of the SMS gateway
+    | - api_key:   Private API key for authentication
+    | - sender_id: The sender name/ID displayed in the message
+    | - type:      Message format ('text', 'unicode', etc.)
+    | - enabled:   Enable or disable SMS sending
+    |
+    | Example usage:
+    | Http::baseUrl(config('app.sms.base_url'))->post('/api/smsapi', [...])
+    |
+    */
+    'sms' => [
+        'base_url'  => env('SMS_BASE_URL', 'https://bulksmsbd.net'),
+        'api_key'   => env('SMS_API_KEY'),
+        'sender_id' => env('SMS_SENDER_ID', 'SENDER'),
+        'type'      => env('SMS_TYPE', 'text'),
+        'enabled'   => env('SMS_ENABLED', false),
+    ],
+
+
     /*
     |--------------------------------------------------------------------------
     | Shipping & Tax
@@ -10,8 +46,18 @@ return [
     | Default shipping cost and tax rate applied to orders.
     |
     */
-    'shipping' => 120,
     'tax'      => 0,
+
+    'shipping' => [
+        'Dhaka' => 80,
+        'Chattogram' => 150,
+        'Rajshahi' => 130,
+        'Khulna' => 120,
+        'Barishal' => 160,
+        'Sylhet' => 110,
+        'Rangpur' => 120,
+        'Mymensingh' => 100,
+    ],
 
     /*
     |--------------------------------------------------------------------------

@@ -32,10 +32,15 @@ class User extends Authenticatable
         ];
     }
 
+    public function routeNotificationForSms()
+    {
+        return $this->phone;
+    }
+
     public function getPhotoUrlAttribute(): string
     {
         if (empty($this->photo)) {
-            return asset('image/photo.svg');
+            return asset('images/photo.svg');
         }
         return Storage::disk('public')->url($this->photo);
     }

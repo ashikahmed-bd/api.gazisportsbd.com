@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\CartResource;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Coupon;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -23,8 +24,6 @@ class CartController extends Controller
         $cart = Cart::firstOrCreate([
             'token' => $token,
         ]);
-
-        $cart->cart_token = $token;
 
         return $cart;
     }
@@ -82,7 +81,13 @@ class CartController extends Controller
         ]);
 
         $item->update([
-            'quantity' => $request->quantity,
+            'quantity' => $request->post('quantity'),
+        ]);
+
+        $cart = $this->getCart($request);
+
+        $cart->update([
+            'discount' => 0,
         ]);
 
         return response()->json([
@@ -93,9 +98,15 @@ class CartController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(CartItem $item)
+    public function destroy(Request $request, CartItem $item)
     {
         $item->delete();
+
+        $cart = $this->getCart($request);
+
+        $cart->update([
+            'discount' => 0,
+        ]);
 
         return response()->json([
             'message' => 'Item removed.',
@@ -111,5 +122,73 @@ class CartController extends Controller
         return response()->json([
             'message' => 'Cart cleared.',
         ], Response::HTTP_OK);
+    }
+
+
+    public function couponApply(Request $request)
+    {
+        $request->validate([
+            'code' => ['required', 'string'],
+        ]);
+
+        $cart = $this->getCart($request);
+
+        $coupon = Coupon::where('code', strtoupper(trim($request->code)))
+            ->where('active', true)
+            ->first();
+
+        if (! $coupon) {
+            return response()->json([
+                'message' => 'Invalid coupon code.',
+            ], 422);
+        }
+
+        if ($coupon->expires_at && $coupon->expires_at->isPast()) {
+            return response()->json([
+                'message' => 'Coupon has expired.',
+            ], 422);
+        }
+
+        $subtotal = $cart->items->sum(function ($item) {
+            return $item->price * $item->quantity;
+        });
+
+        if ($cart->total < $coupon->minimum_amount) {
+            return response()->json([
+                'success' => false,
+                'message' => "Minimum order amount is ৳{$coupon->minimum_amount}.",
+            ], 422);
+        }
+
+        $discount = $coupon->type === 'fixed' ? $coupon->discount : ($subtotal * $coupon->discount / 100);
+
+        $discount = min($discount, $subtotal);
+
+        $cart->update([
+            'discount' => $discount,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Coupon applied successfully.',
+        ]);
+    }
+
+
+    public function shipping(Request $request)
+    {
+        $request->validate([
+            'zone' => ['required', 'string'],
+        ]);
+
+        $cart = $this->getCart($request);
+
+        $cart->update([
+            'shipping' => config('app.shipping.' . $request->zone, 150),
+        ]);
+
+        return response()->json([
+            'message' => 'Shipping updated.',
+        ]);
     }
 }

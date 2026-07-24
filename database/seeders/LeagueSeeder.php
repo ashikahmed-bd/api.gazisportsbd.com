@@ -34,7 +34,7 @@ class LeagueSeeder extends Seeder
                 'logo' => null,
                 'country' => $league['country'],
                 'sort_order' => $index + 1,
-                'status' => true,
+                'active' => true,
                 'meta_title' => $league['name'],
                 'meta_keywords' => strtolower(str_replace(' ', ',', $league['name'])),
                 'meta_description' => 'Browse ' . $league['name'] . ' football jerseys.',

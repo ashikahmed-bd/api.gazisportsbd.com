@@ -100,7 +100,7 @@ class ClubSeeder extends Seeder
                     'founded_year' => null,
                     'stadium' => null,
                     'sort_order' => $sort++,
-                    'status' => true,
+                    'active' => true,
                     'meta_title' => $team,
                     'meta_keywords' => strtolower(str_replace(' ', ',', $team)),
                     'meta_description' => $team . ' official football jerseys.',

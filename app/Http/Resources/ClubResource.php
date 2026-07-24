@@ -27,7 +27,7 @@ class ClubResource extends JsonResource
             'stadium' => $this->stadium,
 
             'sort_order' => (int) $this->sort_order,
-            'status' => (bool) $this->status,
+            'active' => (bool) $this->active,
 
             'meta_title' => $this->meta_title,
             'meta_keywords' => $this->meta_keywords,

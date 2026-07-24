@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
             $table->uuid('token')->unique()->nullable();
-            $table->decimal('shipping', 12, 2)->default(config('app.shipping'));
+            $table->decimal('shipping', 12, 2)->default(0);
             $table->decimal('discount', 12, 2)->default(0);
             $table->timestamps();
         });

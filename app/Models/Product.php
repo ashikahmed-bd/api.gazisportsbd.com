@@ -10,8 +10,10 @@ class Product extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'gallery' => 'array',
         'options' => 'array',
+        'gallery' => 'array',
+        'base_price' => 'decimal:2',
+        'price' => 'decimal:2',
         'featured' => 'boolean',
         'active' => 'boolean',
     ];

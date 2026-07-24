@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->nullable();
             $table->string('cover')->nullable();
-            $table->json('options')->nullable();
+            $table->text('options')->nullable();
 
             $table->decimal('price', 12, 2);
             $table->unsignedInteger('quantity');
