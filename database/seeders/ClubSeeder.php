@@ -84,10 +84,11 @@ class ClubSeeder extends Seeder
             ],
         ];
 
-        $sort = 1;
 
         foreach ($clubs as $leagueName => $teams) {
+
             $league = League::query()->where('name', $leagueName)->first();
+
             foreach ($teams as $team) {
                 Club::create([
                     'league_id' => $league?->id,
@@ -99,7 +100,6 @@ class ClubSeeder extends Seeder
                     'country' => null,
                     'founded_year' => null,
                     'stadium' => null,
-                    'sort_order' => $sort++,
                     'active' => true,
                     'meta_title' => $team,
                     'meta_keywords' => strtolower(str_replace(' ', ',', $team)),

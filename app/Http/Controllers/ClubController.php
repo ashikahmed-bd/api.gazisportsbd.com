@@ -18,6 +18,7 @@ class ClubController extends Controller
     public function index(Request $request)
     {
         $clubs = Club::query()
+            ->with(['league'])
             ->when($request->search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })
@@ -39,7 +40,6 @@ class ClubController extends Controller
             'country' => $request->country,
             'founded_year' => $request->founded_year,
             'stadium' => $request->stadium,
-            'sort_order'  => Club::max('sort_order') + 1,
             'active' => (bool) $request->active,
             'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,
@@ -57,6 +57,8 @@ class ClubController extends Controller
      */
     public function show(Club $club)
     {
+        $club->load(['league']);
+
         return ClubResource::make($club);
     }
 
@@ -72,7 +74,6 @@ class ClubController extends Controller
             'country' => $request->country,
             'founded_year' => $request->founded_year,
             'stadium' => $request->stadium,
-            'sort_order'  => $request->sort_order,
             'active' => (bool) $request->active,
             'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,

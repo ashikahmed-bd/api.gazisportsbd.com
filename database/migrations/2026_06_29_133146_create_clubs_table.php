@@ -17,15 +17,10 @@ return new class extends Migration
 
             $table->string('name');
             $table->string('slug')->unique();
-
             $table->string('logo')->nullable();
             $table->string('country')->nullable();
-
             $table->string('founded_year')->nullable();
-
             $table->string('stadium')->nullable();
-
-            $table->integer('sort_order')->default(0);
             $table->boolean('active')->default(true);
 
             $table->string('meta_title')->nullable();

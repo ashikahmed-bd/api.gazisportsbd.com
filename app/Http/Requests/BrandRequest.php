@@ -33,7 +33,6 @@ class BrandRequest extends FormRequest
                 Rule::unique('brands', 'slug')->ignore($brand)
             ],
             'logo' => ['nullable', 'string'],
-            'country' => ['nullable', 'string', 'max:100'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_keywords' => ['nullable', 'string'],
             'meta_description' => ['nullable', 'string'],
