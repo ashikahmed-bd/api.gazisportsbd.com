@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\VariantResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -49,16 +50,11 @@ class ProductResource extends JsonResource
             'highlights' => $this->highlights,
             'description' => $this->description,
 
-            'options' => $this->options,
-
             'base_price' => (float) $this->base_price,
             'price' => (float) $this->price,
 
             'has_discount' => $this->price > 0 && $this->price < $this->base_price,
             'discount_percentage' => $this->base_price > 0 ? round((($this->base_price - $this->price) / $this->base_price) * 100) : 0,
-
-            'stock' => $this->stock,
-            'in_stock' => $this->stock > 0,
 
             'gender' => $this->gender,
 
@@ -73,6 +69,35 @@ class ProductResource extends JsonResource
 
             'featured' => (bool) $this->featured,
             'active' => (bool) $this->active,
+
+            'options' => [
+                'color' => $this->variants
+                    ->pluck('color')
+                    ->filter()
+                    ->unique()
+                    ->values(),
+
+                'size' => $this->variants
+                    ->pluck('size')
+                    ->filter()
+                    ->unique()
+                    ->values(),
+
+                'sleeves' => $this->variants
+                    ->pluck('sleeves')
+                    ->filter()
+                    ->unique()
+                    ->values(),
+
+                'type' => $this->variants
+                    ->pluck('type')
+                    ->filter()
+                    ->unique()
+                    ->values(),
+            ],
+            'variants' => VariantResource::collection(
+                $this->whenLoaded('variants')
+            ),
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

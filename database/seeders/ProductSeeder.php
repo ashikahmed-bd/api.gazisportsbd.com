@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Club;
+use App\Models\League;
 use App\Models\Product;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -96,6 +97,7 @@ class ProductSeeder extends Seeder
             Product::query()->create(array_merge($product, [
                 'category_id' => fake()->randomElement(Category::query()->pluck('id')->toArray()),
                 'brand_id' => fake()->randomElement(Brand::query()->pluck('id')->toArray()),
+                'league_id' => fake()->randomElement(League::query()->pluck('id')->toArray()),
                 'club_id' => fake()->randomElement(Club::query()->pluck('id')->toArray()),
 
                 'highlights' => '<ul>
@@ -116,13 +118,6 @@ class ProductSeeder extends Seeder
                 <li>Long Lasting Print</li>
                 </ul>
                 ',
-
-                'options' => [
-                    'color' => ['Black', 'White', 'Blue'],
-                    'size' => ['S', 'M', 'L', 'XL', 'XXL']
-                ],
-
-                'stock' => rand(20, 150),
 
                 'gender' => 'unisex',
                 'cover' => null,

@@ -50,13 +50,13 @@ return [
 
     'shipping' => [
         'Dhaka' => 80,
-        'Chattogram' => 150,
-        'Rajshahi' => 130,
+        'Chattogram' => 120,
+        'Rajshahi' => 120,
         'Khulna' => 120,
-        'Barishal' => 160,
-        'Sylhet' => 110,
+        'Barishal' => 120,
+        'Sylhet' => 120,
         'Rangpur' => 120,
-        'Mymensingh' => 100,
+        'Mymensingh' => 120,
     ],
 
     /*

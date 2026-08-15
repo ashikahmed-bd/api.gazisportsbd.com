@@ -34,11 +34,8 @@ class ProductRequest extends FormRequest
             'highlights' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
 
-            'options' => ['nullable', 'array'],
-
             'base_price' => ['required', 'numeric', 'min:0'],
             'price' => ['required', 'numeric', 'min:0'],
-            'stock' => ['required', 'integer', 'min:0'],
             'gender' => ['required', Rule::in(['men', 'women', 'kids', 'unisex']),],
 
             'meta_title' => ['nullable', 'string', 'max:255'],

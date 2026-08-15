@@ -15,10 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('cart_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->text('options')->nullable();
-            $table->unsignedInteger('quantity')->default(1);
+            $table->foreignId('variant_id')->nullable()->constrained('variants')->nullOnDelete();
+            $table->string('sku')->nullable();
             $table->decimal('price', 10, 2);
+            $table->unsignedInteger('quantity')->default(1);
             $table->timestamps();
+
+            $table->unique(['cart_id', 'product_id', 'variant_id']);
         });
     }
 

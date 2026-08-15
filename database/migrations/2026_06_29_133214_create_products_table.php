@@ -14,16 +14,19 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
 
+            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('brand_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('league_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('club_id')->nullable()->constrained()->nullOnDelete();
+
             $table->string('name');
             $table->string('slug')->unique();
 
             $table->text('highlights')->nullable();
             $table->longText('description')->nullable();
-            $table->text('options')->nullable();
 
             $table->decimal('base_price', 10, 2);
             $table->decimal('price', 10, 2);
-            $table->integer('stock')->default(0);
 
             $table->enum('gender', ['men', 'women', 'kids', 'unisex'])->default('unisex');
 
@@ -38,10 +41,6 @@ return new class extends Migration
             $table->boolean('featured')->default(false);
 
             $table->boolean('active')->default(true);
-
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('brand_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('club_id')->nullable()->constrained()->nullOnDelete();
 
             $table->timestamps();
         });

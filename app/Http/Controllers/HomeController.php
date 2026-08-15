@@ -72,7 +72,7 @@ class HomeController extends Controller
 
         $clubs = Club::query()
             ->where('active', true)
-            ->orderBy('sort_order', 'asc')
+            ->orderByDesc('created_at')
             ->take(20)
             ->get();
 
@@ -93,36 +93,67 @@ class HomeController extends Controller
         $sort = $request->input('sort', 'default');
         $limit = $request->input('limit', 12);
         $category = $request->input('category');
+        $brand = $request->input('brand');
+        $club = $request->input('club');
+        $league = $request->input('league');
 
         $products = Product::query()
             ->where('active', true)
+
+            // Category
             ->when($category, function ($query) use ($category) {
                 $query->whereHas('category', function ($query) use ($category) {
                     $query->where('slug', $category);
                 });
             })
 
-            ->when($search, function ($query) use ($search) {
-                $query->where('name', 'LIKE', "%{$search}%");
+            // Brand
+            ->when($brand, function ($query) use ($brand) {
+                $query->whereHas('brand', function ($query) use ($brand) {
+                    $query->where('slug', $brand);
+                });
             })
 
+            // Club
+            ->when($club, function ($query) use ($club) {
+                $query->whereHas('club', function ($query) use ($club) {
+                    $query->where('slug', $club);
+                });
+            })
+
+            // League
+            ->when($league, function ($query) use ($league) {
+                $query->whereHas('league', function ($query) use ($league) {
+                    $query->where('slug', $league);
+                });
+            })
+
+            // Search
+            ->when($search, function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+
+            // Min price
             ->when($request->filled('min_price'), function ($query) use ($request) {
                 $query->where('price', '>=', $request->min_price);
             })
 
+            // Max price
             ->when($request->filled('max_price'), function ($query) use ($request) {
                 $query->where('price', '<=', $request->max_price);
             })
 
-            ->when($sort !== 'default', function ($query) use ($sort) {
+            // Sorting
+            ->when($sort, function ($query) use ($sort) {
                 match ($sort) {
-                    'price_low' => $query->orderBy('price', 'asc'),
+                    'price_low'  => $query->orderBy('price', 'asc'),
                     'price_high' => $query->orderBy('price', 'desc'),
-                    'latest' => $query->orderBy('name', 'desc'),
-                    'popular' => $query->where('featured', true),
-                    default => $query->orderBy('name', 'asc'),
+                    'latest'     => $query->orderBy('created_at', 'desc'),
+                    'popular'    => $query->orderBy('views', 'desc'),
+                    default      => $query->orderBy('created_at', 'desc'),
                 };
             })
+
             ->paginate($limit);
 
         return ProductResource::collection($products);

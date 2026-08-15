@@ -10,7 +10,6 @@ class Product extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'options' => 'array',
         'gallery' => 'array',
         'base_price' => 'decimal:2',
         'price' => 'decimal:2',
@@ -26,6 +25,11 @@ class Product extends Model
     public function brand()
     {
         return $this->belongsTo(Brand::class);
+    }
+
+    public function league()
+    {
+        return $this->belongsTo(League::class);
     }
 
     public function club()

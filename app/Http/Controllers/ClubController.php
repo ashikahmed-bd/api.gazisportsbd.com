@@ -22,7 +22,7 @@ class ClubController extends Controller
             ->when($request->search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })
-            ->latest()
+            ->orderBy('name')
             ->paginate($request->limit ?? 10);
 
         return ClubResource::collection($clubs);
@@ -136,7 +136,6 @@ class ClubController extends Controller
                 $query->where('name', 'like', '%' . $request->q . '%');
             })
             ->orderBy('name')
-            ->limit(20)
             ->get();
 
         return response()->json($clubs);

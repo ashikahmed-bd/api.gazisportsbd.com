@@ -47,19 +47,36 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => ['required', 'exists:products,id'],
+            'variant_id' => ['nullable', 'exists:variants,id'],
             'quantity'   => ['required', 'integer', 'min:1'],
-            'options'    => ['nullable', 'array'],
         ]);
 
         $cart = $this->getCart($request);
-        $product = Product::findOrFail($request->product_id);
+        $product = Product::with('variants')->findOrFail($request->product_id);
+
+        $price = $product->price;
+
+        if ($request->filled('variant_id')) {
+            $variant = $product->variants()
+                ->where('id', $request->variant_id)
+                ->firstOrFail();
+
+            if ($variant->stock < $request->quantity) {
+                return response()->json([
+                    'message' => 'Insufficient variant stock.'
+                ], 422);
+            }
+
+            $price = $variant->price;
+        }
 
         $item = $cart->items()->firstOrNew([
             'product_id' => $product->id,
-            'options'    => $request->options ?? [],
+            'variant_id' => $request->variant_id,
         ]);
 
-        $item->price = $product->price;
+        $item->sku = $request->variant_id ? $variant->sku : $product->sku;
+        $item->price = $price;
         $item->quantity += $request->quantity;
 
         $item->save();
@@ -87,6 +104,8 @@ class CartController extends Controller
         $cart = $this->getCart($request);
 
         $cart->update([
+            'coupon_id' => null,
+            'coupon_code' => null,
             'discount' => 0,
         ]);
 
@@ -166,6 +185,8 @@ class CartController extends Controller
 
         $cart->update([
             'discount' => $discount,
+            'coupon_id' => $coupon->id,
+            'coupon_code' => $coupon->code,
         ]);
 
         return response()->json([
@@ -184,7 +205,7 @@ class CartController extends Controller
         $cart = $this->getCart($request);
 
         $cart->update([
-            'shipping' => config('app.shipping.' . $request->zone, 150),
+            'shipping' => config('app.shipping.' . $request->zone, 120),
         ]);
 
         return response()->json([

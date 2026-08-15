@@ -6,6 +6,7 @@ use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
@@ -44,11 +45,9 @@ class ProductController extends Controller
 
             'highlights' => $request->post('highlights'),
             'description' => $request->post('description'),
-            'options' => $request->post('options'),
 
             'base_price' => $request->post('base_price'),
             'price' => $request->post('price'),
-            'stock' => $request->post('stock'),
             'gender' => $request->post('gender'),
 
             'meta_title' => $request->post('meta_title'),
@@ -70,7 +69,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $product->load(['category', 'brand', 'club']);
+        $product->load(['category', 'brand', 'club', 'variants']);
         return ProductResource::make($product);
     }
 
@@ -184,10 +183,38 @@ class ProductController extends Controller
         ], Response::HTTP_OK);
     }
 
+    public function variants(Request $request, Product $product)
+    {
+        $request->validate([
+            'variants' => ['required', 'array', 'min:1'],
+
+            'variants.*.color' => ['nullable', 'string', 'max:100'],
+            'variants.*.size' => ['nullable', 'string', 'max:100'],
+            'variants.*.sleeves' => ['nullable', 'string', 'max:100'],
+            'variants.*.type' => ['nullable', 'string', 'max:100'],
+
+            'variants.*.price' => ['required', 'numeric', 'min:0'],
+            'variants.*.stock' => ['required', 'integer', 'min:0'],
+        ]);
+
+        DB::transaction(function () use ($product, $request) {
+
+            $product->variants()->delete();
+
+            foreach ($request->variants as $variant) {
+                $product->variants()->create($variant);
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Variants updated successfully.',
+        ], Response::HTTP_OK);
+    }
 
     public function getProductBySlug(Product $product)
     {
-        $product->load(['category', 'brand', 'club']);
+        $product->load(['category', 'brand', 'club', 'variants']);
 
         return new ProductResource($product);
     }

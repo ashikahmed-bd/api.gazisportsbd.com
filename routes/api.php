@@ -7,12 +7,14 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ClubController;
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LeagueController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -21,7 +23,9 @@ Route::get('/home', [HomeController::class, 'index']);
 Route::get('/search', [HomeController::class, 'search']);
 Route::get('/shop', [HomeController::class, 'getShop']);
 Route::get('/products/{product:slug}', [ProductController::class, 'getProductBySlug']);
+Route::get('/pages/{page:slug}', [PageController::class, 'getPage']);
 
+Route::get('settings', [SettingsController::class, 'index']);
 
 Route::prefix('cart')->group(function () {
     Route::get('/', [CartController::class, 'index']);
@@ -92,6 +96,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::delete('products/{product}', [ProductController::class, 'destroy']);
     Route::get('search/products', [ProductController::class, 'search']);
     Route::post('products/{product}/media', [ProductController::class, 'media']);
+    Route::post('products/{product}/variants', [ProductController::class, 'variants']);
 
     // Banners
     Route::get('banners', [BannerController::class, 'index']);
@@ -101,6 +106,20 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::delete('banners/{banner}', [BannerController::class, 'destroy']);
     Route::post('banners/{banner}/image', [BannerController::class, 'image']);
 
+
+    // Coupons
+    Route::get('coupons', [CouponController::class, 'index']);
+    Route::post('coupons', [CouponController::class, 'store']);
+    Route::get('coupons/{coupon}', [CouponController::class, 'show']);
+    Route::put('coupons/{coupon}', [CouponController::class, 'update']);
+    Route::delete('coupons/{coupon}', [CouponController::class, 'destroy']);
+
+    // Pages
+    Route::get('pages', [PageController::class, 'index']);
+    Route::get('pages/{page:slug}', [PageController::class, 'show']);
+    Route::put('pages/{page:slug}', [PageController::class, 'update']);
+
+
     // Orders
     Route::get('orders', [OrderController::class, 'index']);
     Route::get('orders/{order:order_no}', [OrderController::class, 'show']);
@@ -108,8 +127,14 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::delete('orders/{order:order_no}', [OrderController::class, 'destroy']);
 
     Route::prefix('settings')->group(function () {
-        Route::post('seed', [SettingController::class, 'seed']);
-        Route::post('reboot', [SettingController::class, 'reboot']);
-        Route::post('storage-link', [SettingController::class, 'storageLink']);
+
+        Route::get('/', [SettingsController::class, 'index']);
+        Route::post('general', [SettingsController::class, 'general']);
+        Route::post('contact', [SettingsController::class, 'contact']);
+        Route::post('popup', [SettingsController::class, 'popup']);
+
+        Route::post('seed', [SettingsController::class, 'seed']);
+        Route::post('reboot', [SettingsController::class, 'reboot']);
+        Route::post('storage-link', [SettingsController::class, 'storageLink']);
     });
 });

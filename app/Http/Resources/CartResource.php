@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\CouponResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -19,6 +20,8 @@ class CartResource extends JsonResource
         return [
             'id' => $this->id,
             'token' => $this->token,
+            'coupon' => CouponResource::make($this->whenLoaded('coupon')),
+            'coupon_code' => $this->coupon_code,
 
             'subtotal' => (float) $this->subtotal,
             'shipping' => (float) $this->shipping,
