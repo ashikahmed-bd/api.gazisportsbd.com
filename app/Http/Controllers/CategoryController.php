@@ -40,6 +40,7 @@ class CategoryController extends Controller
             'meta_description' => $request->post('meta_description'),
             'meta_keywords' => $request->post('meta_keywords'),
             'sort_order' => Category::max('sort_order') + 1,
+            'is_featured' => $request->post('is_featured'),
             'active' => $request->post('active'),
         ]);
 
@@ -64,14 +65,15 @@ class CategoryController extends Controller
     public function update(CategoryRequest $request, Category $category)
     {
         $category->update([
-            'parent_id' => $request->parent_id,
-            'name' => $request->name,
-            'slug' => Str::slug($request->slug),
-            'meta_title' => $request->meta_title,
-            'meta_description' => $request->meta_description,
-            'meta_keywords' => $request->meta_keywords,
-            'sort_order' => $request->filled('sort_order') ? (int) $request->sort_order : (Category::max('sort_order') ?? 0) + 1,
-            'active' => $request->active,
+            'parent_id' => $request->post('parent_id'),
+            'name' => $request->post('name'),
+            'slug' => Str::slug($request->post('slug')),
+            'meta_title' => $request->post('meta_title'),
+            'meta_description' => $request->post('meta_description'),
+            'meta_keywords' => $request->post('meta_keywords'),
+            'sort_order' => Category::max('sort_order') + 1,
+            'is_featured' => $request->post('is_featured'),
+            'active' => $request->post('active'),
         ]);
 
         return response()->json([

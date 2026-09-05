@@ -26,11 +26,14 @@ class CategoryResource extends JsonResource
             }),
             'name' => $this->name,
             'slug' => $this->slug,
+            'description' => $this->description,
             'image_url' => $this->image_url,
 
             'meta_title' => $this->meta_title,
             'meta_description' => $this->meta_description,
             'meta_keywords' => $this->meta_keywords,
+            'is_featured' => (bool) $this->is_featured,
+            'sort_order' => $this->sort_order,
             'active' => (bool) $this->active,
 
             'children' => CategoryResource::collection($this->whenLoaded('children')),

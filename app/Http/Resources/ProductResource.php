@@ -19,10 +19,6 @@ class ProductResource extends JsonResource
 
         return [
             'id' => $this->id,
-
-            'name' => $this->name,
-            'slug' => $this->slug,
-
             'category' => $this->whenLoaded('category', function () {
                 return [
                     'id' => $this->category->id,
@@ -39,6 +35,14 @@ class ProductResource extends JsonResource
                 ];
             }),
 
+            'league' => $this->whenLoaded('league', function () {
+                return [
+                    'id' => $this->league->id,
+                    'name' => $this->league->name,
+                    'slug' => $this->league->slug,
+                ];
+            }),
+
             'club' => $this->whenLoaded('club', function () {
                 return [
                     'id' => $this->club->id,
@@ -47,11 +51,14 @@ class ProductResource extends JsonResource
                 ];
             }),
 
-            'highlights' => $this->highlights,
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'summary' => $this->summary,
             'description' => $this->description,
 
-            'base_price' => (float) $this->base_price,
-            'price' => (float) $this->price,
+            'price' => $this->price,
+            'base_price' => $this->base_price,
+            'currency' => $this->currency,
 
             'has_discount' => $this->price > 0 && $this->price < $this->base_price,
             'discount_percentage' => $this->base_price > 0 ? round((($this->base_price - $this->price) / $this->base_price) * 100) : 0,
@@ -61,40 +68,42 @@ class ProductResource extends JsonResource
             'cover_url' => $this->cover_url,
             'gallery' => $this->images,
 
+            'views' => $this->views,
+            'featured' => $this->featured,
+            'has_variants' => $this->has_variants,
+
             'meta_title' => $this->meta_title,
             'meta_description' => $this->meta_description,
             'meta_keywords' => $this->meta_keywords,
 
-            'views' => $this->views,
+            'active' => $this->active,
 
-            'featured' => (bool) $this->featured,
-            'active' => (bool) $this->active,
+            'attributes' => $this->whenLoaded(
+                'options',
+                fn() => $this->options
+                    ->pluck('attribute')
+                    ->unique('id')
+                    ->values()
+                    ->map(fn($attribute) => [
+                        'id' => $attribute->id,
+                        'name' => $attribute->name,
+                        'slug' => $attribute->slug,
+                        'type' => $attribute->type,
 
-            'options' => [
-                'color' => $this->variants
-                    ->pluck('color')
-                    ->filter()
-                    ->unique()
-                    ->values(),
+                        'options' => $this->options
+                            ->where('attribute_id', $attribute->id)
+                            ->pluck('option')
+                            ->values()
+                            ->map(fn($option) => [
+                                'id' => $option->id,
+                                'name' => $option->name,
+                                'slug' => $option->slug,
+                                'hex' => $option->hex,
+                                'image' => $option->image,
+                            ]),
+                    ])
+            ),
 
-                'size' => $this->variants
-                    ->pluck('size')
-                    ->filter()
-                    ->unique()
-                    ->values(),
-
-                'sleeves' => $this->variants
-                    ->pluck('sleeves')
-                    ->filter()
-                    ->unique()
-                    ->values(),
-
-                'type' => $this->variants
-                    ->pluck('type')
-                    ->filter()
-                    ->unique()
-                    ->values(),
-            ],
             'variants' => VariantResource::collection(
                 $this->whenLoaded('variants')
             ),

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('brand_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('league_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('club_id')->nullable()->constrained()->nullOnDelete();
@@ -22,23 +22,25 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
 
-            $table->text('highlights')->nullable();
+            $table->text('summary')->nullable();
             $table->longText('description')->nullable();
 
-            $table->decimal('base_price', 10, 2);
-            $table->decimal('price', 10, 2);
+            $table->decimal('price', 12, 2)->nullable();
+            $table->decimal('base_price', 12, 2)->nullable();
+            $table->char('currency', 3)->default(config('app.currency'));
 
             $table->enum('gender', ['men', 'women', 'kids', 'unisex'])->default('unisex');
 
             $table->string('cover')->nullable();
             $table->text('gallery')->nullable();
 
+            $table->unsignedInteger('views')->default(0);
+            $table->boolean('featured')->default(false);
+            $table->boolean('has_variants')->default(false);
+
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->text('meta_keywords')->nullable();
-
-            $table->unsignedInteger('views')->default(0);
-            $table->boolean('featured')->default(false);
 
             $table->boolean('active')->default(true);
 

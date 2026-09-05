@@ -13,21 +13,25 @@ return new class extends Migration
     {
         Schema::create('variants', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
 
-            $table->string('color')->nullable();
-            $table->string('size')->nullable();
-            $table->string('sleeves')->nullable();
-            $table->string('type')->nullable();
+            $table->foreignId('product_id')
+                ->constrained('products')
+                ->cascadeOnDelete();
 
             $table->string('sku')->unique();
 
-            $table->decimal('price', 12, 2);
+            $table->string('name')->nullable();
+
+            $table->decimal('price', 12, 2)->nullable();
+            $table->decimal('base_price', 12, 2)->nullable();
+
             $table->unsignedInteger('stock')->default(0);
 
-            $table->timestamps();
+            $table->unsignedInteger('low_stock_threshold')
+                ->default(5);
 
-            $table->index('product_id');
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
         });
     }
 

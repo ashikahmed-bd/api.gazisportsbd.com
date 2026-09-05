@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             LeagueSeeder::class,
             ClubSeeder::class,
             BannerSeeder::class,
+            AttributeSeeder::class,
             ProductSeeder::class,
             CouponSeeder::class,
             PageSeeder::class,

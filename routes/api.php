@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BrandController;
@@ -87,6 +88,9 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::delete('clubs/{club}', [ClubController::class, 'destroy']);
     Route::post('clubs/{club}/logo', [ClubController::class, 'logo']);
     Route::get('search/clubs', [ClubController::class, 'search']);
+
+    Route::get('/attributes', [AttributeController::class, 'getAttributes']);
+
 
     // Products
     Route::get('products', [ProductController::class, 'index']);

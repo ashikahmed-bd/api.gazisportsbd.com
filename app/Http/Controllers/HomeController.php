@@ -15,7 +15,6 @@ use App\Models\Club;
 use App\Models\League;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 class HomeController extends Controller
@@ -155,6 +154,21 @@ class HomeController extends Controller
             })
 
             ->paginate($limit);
+
+        return ProductResource::collection($products);
+    }
+
+
+    public function search(Request $request)
+    {
+        $search = $request->query('query');
+
+        $products = Product::query()
+            ->when($search, function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->get();
 
         return ProductResource::collection($products);
     }

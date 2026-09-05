@@ -100,7 +100,7 @@ class ProductSeeder extends Seeder
                 'league_id' => fake()->randomElement(League::query()->pluck('id')->toArray()),
                 'club_id' => fake()->randomElement(Club::query()->pluck('id')->toArray()),
 
-                'highlights' => '<ul>
+                'summary' => '<ul>
                     <li>100% Premium Polyester</li>
                     <li>Official Club Design</li>
                     <li>Breathable Fabric</li>

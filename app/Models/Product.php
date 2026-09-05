@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
@@ -37,16 +38,16 @@ class Product extends Model
         return $this->belongsTo(Club::class);
     }
 
-    public function variants()
+    public function options(): HasMany
+    {
+        return $this->hasMany(ProductOption::class)->orderBy('sort_order');
+    }
+
+    public function variants(): HasMany
     {
         return $this->hasMany(Variant::class);
     }
 
-
-    public function reviews()
-    {
-        return $this->hasMany(Review::class);
-    }
 
     public function getCoverUrlAttribute(): string
     {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Models\AttributeOption;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -186,36 +187,89 @@ class ProductController extends Controller
     public function variants(Request $request, Product $product)
     {
         $request->validate([
+            'options' => ['required', 'array'],
+            'options.*.attribute_id' => ['required', 'exists:attributes,id'],
+            'options.*.attribute_option_id' => ['required', 'exists:attribute_options,id'],
+
             'variants' => ['required', 'array', 'min:1'],
+            'variants.*.sku' => ['required', 'string'],
+            'variants.*.name' => ['nullable', 'string'],
+            'variants.*.price' => ['nullable', 'numeric', 'min:0'],
+            'variants.*.base_price' => ['nullable', 'numeric', 'min:0'],
+            'variants.*.stock' => ['nullable', 'integer', 'min:0'],
+            'variants.*.low_stock_threshold' => ['nullable', 'integer', 'min:0'],
+            'variants.*.is_active' => ['boolean'],
 
-            'variants.*.color' => ['nullable', 'string', 'max:100'],
-            'variants.*.size' => ['nullable', 'string', 'max:100'],
-            'variants.*.sleeves' => ['nullable', 'string', 'max:100'],
-            'variants.*.type' => ['nullable', 'string', 'max:100'],
-
-            'variants.*.price' => ['required', 'numeric', 'min:0'],
-            'variants.*.stock' => ['required', 'integer', 'min:0'],
+            'variants.*.options' => ['required', 'array', 'min:1'],
+            'variants.*.options.*.attribute_id' => [
+                'required',
+                'exists:attributes,id',
+            ],
+            'variants.*.options.*.attribute_option_id' => [
+                'required',
+                'exists:attribute_options,id',
+            ],
         ]);
 
-        DB::transaction(function () use ($product, $request) {
+        DB::transaction(function () use ($request, $product) {
 
+            // Delete old variants
             $product->variants()->delete();
 
-            foreach ($request->variants as $variant) {
-                $product->variants()->create($variant);
+            // Delete old product options if needed
+            $product->options()->delete();
+
+            $product->update([
+                'has_variants' => true,
+            ]);
+
+            foreach ($request->options as $index => $option) {
+                $product->options()->updateOrCreate(
+                    [
+                        'attribute_id' => $option['attribute_id'],
+                        'attribute_option_id' => $option['attribute_option_id'],
+                    ],
+                    [
+                        'sort_order' => $index,
+                    ]
+                );
+            }
+
+            foreach ($request->variants as $item) {
+
+                $variant = $product->variants()->create([
+                    'sku' => $item['sku'],
+                    'name' => $item['name'] ?? null,
+                    'price' => $item['price'] ?? null,
+                    'base_price' => $item['base_price'] ?? null,
+                    'stock' => $item['stock'] ?? 0,
+                    'low_stock_threshold' => $item['low_stock_threshold'] ?? 5,
+                    'is_active' => $item['is_active'] ?? true,
+                ]);
+
+                $variant->options()->createMany($item['options']);
             }
         });
 
         return response()->json([
-            'success' => true,
-            'message' => 'Variants updated successfully.',
-        ], Response::HTTP_OK);
+            'message' => 'Product variants created successfully.',
+        ], 201);
     }
 
     public function getProductBySlug(Product $product)
     {
-        $product->load(['category', 'brand', 'club', 'variants']);
+        $product->load([
+            'category',
+            'brand',
+            'league',
+            'club',
+            'options.attribute',
+            'options.option',
 
-        return new ProductResource($product);
+            'variants.options.attribute',
+            'variants.options.option',
+        ]);
+
+        return ProductResource::make($product);
     }
 }

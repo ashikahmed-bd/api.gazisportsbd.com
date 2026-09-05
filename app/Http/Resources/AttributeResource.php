@@ -2,11 +2,10 @@
 
 namespace App\Http\Resources;
 
-use App\Http\Resources\VariantOptionResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class VariantResource extends JsonResource
+class AttributeResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,18 +18,11 @@ class VariantResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'sku' => $this->sku,
             'name' => $this->name,
+            'slug' => $this->slug,
+            'type' => $this->type,
 
-            'price' => $this->price,
-            'base_price' => $this->base_price,
-
-            'stock' => $this->stock,
-            'low_stock_threshold' => $this->low_stock_threshold,
-
-            'is_active' => $this->is_active,
-
-            'options' => VariantOptionResource::collection(
+            'options' => AttributeOptionResource::collection(
                 $this->whenLoaded('options')
             ),
         ];

@@ -4,6 +4,8 @@ return [
 
     'disk' => 'public',
 
+    'currency' => 'BDT',
+
     'support' => [
         'phone' => env('SUPPORT_PHONE'),
         'whatsapp' => env('SUPPORT_WHATSAPP'),
