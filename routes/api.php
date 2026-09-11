@@ -16,6 +16,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\VariantController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -100,7 +101,8 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::delete('products/{product}', [ProductController::class, 'destroy']);
     Route::get('search/products', [ProductController::class, 'search']);
     Route::post('products/{product}/media', [ProductController::class, 'media']);
-    Route::post('products/{product}/variants', [ProductController::class, 'variants']);
+    Route::get('products/{product}/variants', [VariantController::class, 'index']);
+    Route::post('products/{product}/variants', [VariantController::class, 'store']);
 
     // Banners
     Route::get('banners', [BannerController::class, 'index']);

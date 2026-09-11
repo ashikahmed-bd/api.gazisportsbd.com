@@ -44,7 +44,7 @@ class ProductController extends Controller
             'name' => $request->post('name'),
             'slug' => Str::slug($request->slug) . '-' . Str::substr((string) Str::uuid(), 0, 8),
 
-            'highlights' => $request->post('highlights'),
+            'summary' => $request->post('summary'),
             'description' => $request->post('description'),
 
             'base_price' => $request->post('base_price'),
@@ -184,77 +184,6 @@ class ProductController extends Controller
         ], Response::HTTP_OK);
     }
 
-    public function variants(Request $request, Product $product)
-    {
-        $request->validate([
-            'options' => ['required', 'array'],
-            'options.*.attribute_id' => ['required', 'exists:attributes,id'],
-            'options.*.attribute_option_id' => ['required', 'exists:attribute_options,id'],
-
-            'variants' => ['required', 'array', 'min:1'],
-            'variants.*.sku' => ['required', 'string'],
-            'variants.*.name' => ['nullable', 'string'],
-            'variants.*.price' => ['nullable', 'numeric', 'min:0'],
-            'variants.*.base_price' => ['nullable', 'numeric', 'min:0'],
-            'variants.*.stock' => ['nullable', 'integer', 'min:0'],
-            'variants.*.low_stock_threshold' => ['nullable', 'integer', 'min:0'],
-            'variants.*.is_active' => ['boolean'],
-
-            'variants.*.options' => ['required', 'array', 'min:1'],
-            'variants.*.options.*.attribute_id' => [
-                'required',
-                'exists:attributes,id',
-            ],
-            'variants.*.options.*.attribute_option_id' => [
-                'required',
-                'exists:attribute_options,id',
-            ],
-        ]);
-
-        DB::transaction(function () use ($request, $product) {
-
-            // Delete old variants
-            $product->variants()->delete();
-
-            // Delete old product options if needed
-            $product->options()->delete();
-
-            $product->update([
-                'has_variants' => true,
-            ]);
-
-            foreach ($request->options as $index => $option) {
-                $product->options()->updateOrCreate(
-                    [
-                        'attribute_id' => $option['attribute_id'],
-                        'attribute_option_id' => $option['attribute_option_id'],
-                    ],
-                    [
-                        'sort_order' => $index,
-                    ]
-                );
-            }
-
-            foreach ($request->variants as $item) {
-
-                $variant = $product->variants()->create([
-                    'sku' => $item['sku'],
-                    'name' => $item['name'] ?? null,
-                    'price' => $item['price'] ?? null,
-                    'base_price' => $item['base_price'] ?? null,
-                    'stock' => $item['stock'] ?? 0,
-                    'low_stock_threshold' => $item['low_stock_threshold'] ?? 5,
-                    'is_active' => $item['is_active'] ?? true,
-                ]);
-
-                $variant->options()->createMany($item['options']);
-            }
-        });
-
-        return response()->json([
-            'message' => 'Product variants created successfully.',
-        ], 201);
-    }
 
     public function getProductBySlug(Product $product)
     {

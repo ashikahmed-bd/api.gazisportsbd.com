@@ -161,7 +161,7 @@ class HomeController extends Controller
 
     public function search(Request $request)
     {
-        $search = $request->query('query');
+        $search = $request->query('keyword');
 
         $products = Product::query()
             ->when($search, function ($query) use ($search) {

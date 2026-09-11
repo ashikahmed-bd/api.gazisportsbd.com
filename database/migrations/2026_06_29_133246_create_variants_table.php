@@ -18,7 +18,7 @@ return new class extends Migration
                 ->constrained('products')
                 ->cascadeOnDelete();
 
-            $table->string('sku')->unique();
+            $table->string('sku')->nullable();
 
             $table->string('name')->nullable();
 
@@ -32,6 +32,11 @@ return new class extends Migration
 
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->unique([
+                'product_id',
+                'sku',
+            ]);
         });
     }
 

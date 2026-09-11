@@ -29,14 +29,10 @@ return new class extends Migration
 
             $table->timestamps();
 
+            // One option per attribute for each variant
             $table->unique([
                 'variant_id',
-                'attribute_id'
-            ]);
-
-            $table->unique([
-                'variant_id',
-                'attribute_option_id'
+                'attribute_id',
             ]);
         });
     }

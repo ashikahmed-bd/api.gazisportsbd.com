@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -31,7 +30,7 @@ class ProductRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', Rule::unique('products', 'slug')->ignore($this->route('product')?->id)],
 
-            'highlights' => ['nullable', 'string'],
+            'summary' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
 
             'base_price' => ['required', 'numeric', 'min:0'],
